@@ -8,11 +8,15 @@ harbors.Sync = harbors.Class.extend({
     //sync type
     _type: null,
 
+    _con: null,
+    _callback: null,
+
     //init
     ctor: function(type){
 
         this.ctor = type;
         this.task = [];
+        this._con = 0;
     },
 
     //add task
@@ -24,40 +28,24 @@ harbors.Sync = harbors.Class.extend({
         }
     },
 
-    _runTask: function(fun){
-        var self = this;
-        var counter = 0;
-        var end = function(){
-            ++counter == self.taskList.length && fun();
-        };
-        var cycle = function(){
-            for(var i=0;i<self.taskList.length;i++){
-                self.taskList[i](cycle);
-            }
-        };
-        var con = function(){
-            if(counter == self.taskList.length){
-                fun();
-            }else{
-                var _fun = self.taskList[counter++];
-                _fun.call(_fun, con, arguments);
-            }
+    _normalCallback: function(){
+        this._con++;
+        if(this._con >= this._task.length){
+            this._callback();
+        }
+    },
 
-        };
-
-        switch(self.type){
-            case 'enhance':
-                con();
-                break;
-            default:
-                cycle();
+    _runTask: function(){
+        for(var i=0;i<this._task.length;i++){
+            this._task[i](this._normalCallback);
         }
     },
 
     //run task list
     runTask: function(fun){
         if(typeof fun === 'function'){
-            this._runTask(fun);
+            this._callback = fun;
+            this._runTask();
         }else{
             harbors.log('runTask is error.');
         }

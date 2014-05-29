@@ -143,6 +143,10 @@ harbors.Response = harbors.Class.extend({
      */
     getSent: function(){
         return this.self.headersSent;
+    },
+
+    setSession: function(name, value, option){
+        harbors.log("Session does not exist");
     }
 });
 

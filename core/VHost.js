@@ -24,6 +24,7 @@ harbors.VHost = harbors.Class.extend({
         this._domain = {};
         this._cache = {};
         this._router = router;
+        this._session = harbors.FileSession.create();
     },
 
     getRouter: function(){
@@ -39,27 +40,48 @@ harbors.VHost = harbors.Class.extend({
 
         var self = this;
 
-        //create req
-        req = harbors.Request.create(req);
-        res = harbors.Response.create(res);
+        var task = harbors.Sync.create();
+        task.setTask(function(next){
 
-        if(self._acceptPost && req.method === "POST"){
-            var form = new multiparty.Form({
-                uploadDir:this._tmpDir
-            });
-            form.parse(req, function(err, fields, files){
-                if(err){
-                    self._notFound(req, res);
-                    return;
-                }
-                req._postParam = fields;
-                req._fileParam = files;
-                self._findDomain(req, res);
-            });
-            return;
-        }
+            //create req
+            req = harbors.Request.create(req);
+            res = harbors.Response.create(res);
 
-        self._findDomain(req, res);
+            next();
+        });
+
+        task.setTask(function(next){
+            //session
+            this._session.update(req, res);
+
+            next();
+        });
+
+        task.setTask(function(next){
+            if(self._acceptPost && req.method === "POST"){
+                var form = new multiparty.Form({
+                    uploadDir:this._tmpDir
+                });
+                form.parse(req, function(err, fields, files){
+                    if(err){
+                        self._notFound(req, res);
+                        return;
+                    }
+                    req._postParam = fields;
+                    req._fileParam = files;
+                    self._findDomain(req, res);
+                    next();
+                });
+            }else{
+                next();
+            }
+        });
+
+        task.runTask(function(){
+
+            self._findDomain(req, res);
+        });
+
     },
 
     /**

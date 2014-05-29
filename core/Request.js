@@ -73,6 +73,19 @@ harbors.Request = {
             }
         }
         return name ? this._cookie[name] : this._cookie;
+    },
+
+    /**
+     *
+     * @param name
+     * @returns {*}
+     */
+    getSesion: function(name){
+        if(!this._session){
+            harbors.log('Session does not exist');
+            return;
+        }
+        return name ? this._session[name] : this._session;
     }
 };
 
