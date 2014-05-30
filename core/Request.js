@@ -65,14 +65,30 @@ harbors.Request = {
     getCookie: function(name){
         if(!this._cookie){
             var string = this.headers['cookie'];
-            var strArr = string.split(";");
             this._cookie = {};
+            if(string === undefined){
+                return this._cookie;
+            }
+            var strArr = string.split(";");
             for(var i = 0; i < strArr.length; i++){
                 var map = strArr[i].split("=");
                 this._cookie[map[0]] = map[1];
             }
         }
         return name ? this._cookie[name] : this._cookie;
+    },
+
+    /**
+     *
+     * @param name
+     * @returns {*}
+     */
+    getSession: function(name){
+        if(!this._session){
+            harbors.log('Session does not exist');
+            return;
+        }
+        return name ? this._session['data'][name] : this._session['data'];
     }
 };
 

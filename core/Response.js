@@ -21,8 +21,11 @@ harbors.Response = harbors.Class.extend({
      * @param encoding
      */
     end: function(data, encoding){
-        if(this.getSent()){
+        if(!this.getSent()){
             this.writeHeader(200);
+        }
+        if(this.saveSession){
+            this.saveSession();
         }
         this.self.end(data, encoding);
     },
@@ -143,6 +146,15 @@ harbors.Response = harbors.Class.extend({
      */
     getSent: function(){
         return this.self.headersSent;
+    },
+
+    /**
+     *
+     * @param name
+     * @param value
+     */
+    setSession: function(name, value){
+        this._session['data'][name] = value;
     }
 });
 
