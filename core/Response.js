@@ -21,8 +21,11 @@ harbors.Response = harbors.Class.extend({
      * @param encoding
      */
     end: function(data, encoding){
-        if(this.getSent()){
+        if(!this.getSent()){
             this.writeHeader(200);
+        }
+        if(this.saveSession){
+            this.saveSession();
         }
         this.self.end(data, encoding);
     },
@@ -145,8 +148,13 @@ harbors.Response = harbors.Class.extend({
         return this.self.headersSent;
     },
 
-    setSession: function(name, value, option){
-        harbors.log("Session does not exist");
+    /**
+     *
+     * @param name
+     * @param value
+     */
+    setSession: function(name, value){
+        this._session['data'][name] = value;
     }
 });
 

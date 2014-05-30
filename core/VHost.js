@@ -52,15 +52,16 @@ harbors.VHost = harbors.Class.extend({
 
         task.setTask(function(next){
             //session
-            this._session.update(req, res);
+            self._session.update(req, res, req.getCookie(), function(){
+                next();
+            });
 
-            next();
         });
 
         task.setTask(function(next){
             if(self._acceptPost && req.method === "POST"){
                 var form = new multiparty.Form({
-                    uploadDir:this._tmpDir
+                    uploadDir:self._tmpDir
                 });
                 form.parse(req, function(err, fields, files){
                     if(err){

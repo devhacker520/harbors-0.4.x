@@ -15,7 +15,7 @@ harbors.Sync = harbors.Class.extend({
     ctor: function(type){
 
         this.ctor = type;
-        this.task = [];
+        this._task = [];
         this._con = 0;
     },
 
@@ -28,16 +28,17 @@ harbors.Sync = harbors.Class.extend({
         }
     },
 
-    _normalCallback: function(){
-        this._con++;
-        if(this._con >= this._task.length){
-            this._callback();
-        }
-    },
-
     _runTask: function(){
-        for(var i=0;i<this._task.length;i++){
-            this._task[i](this._normalCallback);
+        var self = this;
+        var con = 0;
+        var len = this._task.length;
+        for(var i=0;i<len;i++){
+            this._task[i](function(){
+                con++;
+                if(con >= len){
+                    self._callback();
+                }
+            });
         }
     },
 

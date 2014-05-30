@@ -3,11 +3,24 @@ var harbors = require('../index');
 var fs = require('fs');
 var path = require('path');
 
+/*
+
+ The data format:
+
+ {
+     data: {
+         -sessionName-: -sessionValue-
+     },
+     expired: -dateNumber-
+ }
+
+ */
+
 harbors.Session = harbors.Class.extend({
 
     _cookieName: "HARBORS_SID",
     _sessionLength: 20,
-    _timeOut: 0,
+    _expired: 3600000,
 
     /**
      * Init session object
@@ -16,23 +29,35 @@ harbors.Session = harbors.Class.extend({
         harbors.log("Please cover the method.");
     },
 
-    saveSession: function(session, name, value, option){
+    saveSession: function(cookieName){
+        harbors.log("Please cover the method.");
+    },
+
+    readSession: function(cookieName, callback){
         harbors.log("Please cover the method.");
     },
 
     /**
      * Create session for client
      */
-    update: function(req, res, cookie){
+    update: function(req, res, cookie, callback){
         var self = this;
-        var session = cookie[this._cookieName];
-        if(session === 'undefined'){
-            session = this.createCookie(req, res);
+        var cookieName = cookie[this._cookieName];
+        if(cookieName === undefined){
+            cookieName = this.createCookie(req, res);
         }
 
-        res.setSession = function(name, value, option){
-            self.saveSession(session, name, value, option);
+        res.saveSession = function(){
+            self.saveSession(cookieName, res._session);
         };
+
+        this.readSession(cookieName, function(session){
+            req._session = session;
+            res._session = session;
+            callback();
+        });
+
+
     },
 
     createCookie: function(req, res){
@@ -41,6 +66,22 @@ harbors.Session = harbors.Class.extend({
             httpOnly: true
         });
         return session;
+    },
+
+    completeData: function(data){
+
+        if(typeof data !== 'object' || data['expired'] === undefined || data['expired'] < new Date() - 0){
+            data = {};
+        }
+
+        //update expire time
+        data['expired'] = new Date() - 0 + this._expired;
+
+        if(data['data'] === undefined){
+            data['data'] = {};
+        }
+
+        return data;
     }
 });
 
@@ -51,8 +92,6 @@ harbors.FileSession = harbors.Session.extend({
     ctor: function(){
         //Default dirname path
         this._path = path.join(__dirname, '../tmp');
-        //create directory
-        harbors.Directory.recursiveCreate(this._path);
     },
 
     /**
@@ -65,6 +104,40 @@ harbors.FileSession = harbors.Session.extend({
             //create directory
             harbors.Directory.recursiveCreate(this._path);
         }
+    },
+
+    readSession: function(cookieName, callback){
+        var self = this;
+        var sessionFile = path.join(this._path, cookieName);
+        if(fs.existsSync(sessionFile)){
+            fs.readFile(sessionFile, function(err, data){
+                if(err){
+                    harbors.error(err);
+                    return;
+                }
+                var session = self.completeData(JSON.parse(data.toString()));
+                callback(session);
+            });
+        }else{
+            callback(self.completeData({}));
+        }
+    },
+
+    saveSession: function(cookieName, session){
+        //create directory
+        harbors.Directory.recursiveCreate(this._path);
+        var sessionFile = path.join(this._path, cookieName);
+        for(var save in session){
+            break;
+        }
+        if(save){
+            fs.writeFile(sessionFile, JSON.stringify(session), function(err){
+                if(err){
+                    harbors.error(err);
+                }
+            });
+        }
+
     }
 });
 
