@@ -96,7 +96,8 @@ harbors.VHost = harbors.Class.extend({
         var _fullHost = req.headers.host;
         //Find cache
         if(this._cache[_fullHost]){
-            this._domain[ this._cache[_fullHost] ].route.call(this._domain[ this._cache[_fullHost] ], req, res);
+            res._workDir = this._domain[ this._cache[_fullHost] ]._workDir;
+            this._domain[ this._cache[_fullHost] ].route.call(this._domain[ this._cache[_fullHost]], req, res);
             return;
         }
 
@@ -107,6 +108,7 @@ harbors.VHost = harbors.Class.extend({
 
             //Domain name completely equal
             if(p === _urlTemp){
+                res._workDir = this._domain[_urlTemp]._workDir;
                 this._domain[_urlTemp].route.call(this._domain[_urlTemp], req, res);
                 //cache
                 this._cache[_fullHost] = _urlTemp;
@@ -120,6 +122,7 @@ harbors.VHost = harbors.Class.extend({
             }
 
             if(_tmp != _urlTemp){
+                res._workDir = this._domain[_urlTemp]._workDir;
                 this._domain[_urlTemp].route.call(this._domain[_urlTemp], req, res);
                 //cache
                 this._cache[_fullHost] = _urlTemp;
@@ -130,6 +133,7 @@ harbors.VHost = harbors.Class.extend({
         if(this._router){
             //Host is not Found.
             this._router(req, res);
+            res._workDir = this._router._workDir;
         }else{
             res.end("1. Did not find any relevant Domain Hosting\n2. Default router does not exist");
         }
