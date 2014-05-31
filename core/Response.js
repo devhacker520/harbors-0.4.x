@@ -162,7 +162,7 @@ harbors.Response = harbors.Class.extend({
 
     render: function(fileName, option){
         var self = this;
-        if(!/^(\s\:\\)|(\/)/.test(fileName)){
+        if(!/^(\s\:\\)|^(\/)/.test(fileName)){
             fileName = path.join(this._workDir, fileName);
         }
         try{
