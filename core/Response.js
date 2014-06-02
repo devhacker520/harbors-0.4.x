@@ -1,5 +1,8 @@
 var harbors = require("../index");
 
+var jade = require("jade");
+var path = require("path");
+
 harbors.Response = harbors.Class.extend({
 
     _headers: null,
@@ -8,7 +11,7 @@ harbors.Response = harbors.Class.extend({
         this.self = res;
         this._headers = {
             'Set-Cookie': [],
-            'Server': 'HARBORS / 0.4.0 alpha1'
+            'Server': 'HARBORS / 0.4.0'
         };
     },
 
@@ -155,6 +158,24 @@ harbors.Response = harbors.Class.extend({
      */
     setSession: function(name, value){
         this._session['data'][name] = value;
+    },
+
+    render: function(fileName, option){
+        var self = this;
+        if(!/^(\s\:\\)|^(\/)/.test(fileName)){
+            fileName = path.join(this._workDir, fileName);
+        }
+        try{
+            jade.renderFile(fileName, option, function(err, data){
+                if(err){
+                    harbors.error(err);
+                    return;
+                }
+                self.end(data);
+            });
+        }catch(err){
+            harbors.error(err);
+        }
     }
 });
 

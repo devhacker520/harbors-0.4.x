@@ -153,7 +153,7 @@ harbors.AutoRouter = harbors.Router.extend({
             if(lastModified == req.headers[ifModifiedSince]){
 
                 this._returnData(304, null, null, res, req);
-                return;
+
             }else{
 
                 this._returnData(200, {
