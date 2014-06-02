@@ -115,8 +115,13 @@ harbors.FileSession = harbors.Session.extend({
                     harbors.error(err);
                     return;
                 }
-                var session = self.completeData(JSON.parse(data.toString()));
-                callback(session);
+                var session;
+                try{
+                    session = self.completeData(JSON.parse(data.toString()));
+                    callback(session);
+                }catch(err){
+                    callback(self.completeData({}));
+                }
             });
         }else{
             callback(self.completeData({}));
