@@ -182,6 +182,19 @@ harbors.Router = harbors.Class.extend({
     },
 
     /**
+     * Set route function of handle
+     *
+     * @param handle
+     */
+    setRoute: function(name, handle){
+        if(typeof name === "string" && typeof handle === "function"){
+            this._routeTable[name] = handle;
+        }else{
+            harbors.error("setRouter is error");
+        }
+    },
+
+    /**
      * Set a function for not found route
      *
      * @param {Function} Function
