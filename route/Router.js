@@ -62,11 +62,26 @@ harbors.Router = harbors.Class.extend({
                     }
                 }
 
-                this._notFound(req, res);
+                this._fuzzyRouter(req, res, url);
             }else{
-                this._notFound(req, res);
+                this._fuzzyRouter(req, res, url);
             }
         }
+
+    },
+
+    _fuzzyRouter: function(req, res, url){
+        for(var p in this._routeTable){
+            if(/\*/.test(p)){
+                var n = new RegExp(p.replace(/\*/g, "(.*)?"));
+                if(n.test(url)){
+                    this._routeTable[p](req, res);
+                    return;
+                }
+            }
+        }
+
+        this._notFound(req, res);
 
     },
 
