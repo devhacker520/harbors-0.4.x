@@ -23,7 +23,7 @@ harbors.Request = {
      * @returns {string|Url.pathname|*}
      */
     getURL: function(){
-        if(this._parseUrl === null)
+        if(this._parseUrl === undefined)
             this._parseUrl = url.parse(this.url, true);
 
         return this._parseUrl.pathname;
@@ -33,10 +33,10 @@ harbors.Request = {
      *
      * @returns {Url.query|*}
      */
-    getGetParam: function(){
-        if(this._parseUrl === null)
+    getGetParam: function(name){
+        if(this._parseUrl === undefined)
             this._parseUrl = url.parse(this.url, true);
-        return this._parseUrl.query;
+        return name ? this._parseUrl.query[name] : this._parseUrl.query;
     },
 
     /**
