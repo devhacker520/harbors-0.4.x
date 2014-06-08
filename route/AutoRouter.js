@@ -196,6 +196,7 @@ harbors.AutoRouter = harbors.Router.extend({
 
     _returnData: function(statCode, headers, buffer, res, req, extname){
 
+        var self = this;
         statCode = statCode || 200;
         headers = headers || {};
 
@@ -205,12 +206,14 @@ harbors.AutoRouter = harbors.Router.extend({
 
             headers['Content-Encoding'] = 'gzip';
 
-            res.writeHeader(statCode, headers);
-
             zlib.gzip(buffer, function(error, buffer){
                 if(error) {
                     throw error;
                 }
+
+                self._returnLenght(res, buffer);
+
+                res.writeHeader(statCode, headers);
 
                 res.end(buffer);
 
@@ -222,12 +225,14 @@ harbors.AutoRouter = harbors.Router.extend({
 
             headers['Content-Encoding'] = 'deflate';
 
-            res.writeHeader(statCode, headers);
-
             zlib.deflate(buffer, function(error, buffer){
                 if(error) {
                     throw error;
                 }
+
+                self._returnLenght(res, buffer);
+
+                res.writeHeader(statCode, headers);
 
                 res.end(buffer);
 
@@ -235,10 +240,25 @@ harbors.AutoRouter = harbors.Router.extend({
             return;
         }
 
+        this._returnLenght(res, buffer);
+
         res.writeHeader(statCode, headers);
 
         res.end(buffer);
 
+    },
+
+    _returnLenght: function(res, buffer){
+        switch(typeof buffer){
+            case 'string':
+                res.setHeader('Content-Length', Buffer.byteLength(buffer, 'utf-8'));
+                break;
+            case 'undefined':
+                res.setHeader('Content-Length', 0);
+                break;
+            default:
+                res.setHeader('Content-Length', buffer.length);
+        }
     },
 
     /**
