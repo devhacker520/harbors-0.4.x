@@ -46,6 +46,7 @@ harbors.Router = harbors.Class.extend({
         if(this._rewrite){
             url = this._rewrite(url);
         }
+        res.setHeader("Content-Type", "text/html");
 
         if(this._routeTable[url]){
 

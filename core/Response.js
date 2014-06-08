@@ -11,7 +11,8 @@ harbors.Response = harbors.Class.extend({
         this.self = res;
         this._headers = {
             'Set-Cookie': [],
-            'Server': 'HARBORS / 0.4.0'
+            'Server': 'HARBORS / 0.4.0',
+            'X-Powered-By': 'NODEJS'
         };
     },
 
