@@ -45,6 +45,10 @@ harbors.Request = {
      * @returns {*}
      */
     getPostParam: function(name){
+        if(this._postParam){
+            harbors.log('The server did not accept the post parameter');
+            return;
+        }
         return name ? this._postParam[name] : this._postParam;
     },
 
