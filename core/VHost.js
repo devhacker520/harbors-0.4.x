@@ -13,7 +13,7 @@ harbors.VHost = harbors.Class.extend({
     _cache: null,
     //session class
     _session: null,
-    _acceptPost: null,
+    _acceptPost: true,
     _tmpDir: path.join(__dirname,'../tmp'),
 
     /**
