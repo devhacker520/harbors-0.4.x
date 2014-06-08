@@ -249,15 +249,17 @@ harbors.AutoRouter = harbors.Router.extend({
     },
 
     _returnLenght: function(res, buffer){
-        switch(typeof buffer){
-            case 'string':
-                res.setHeader('Content-Length', Buffer.byteLength(buffer, 'utf-8'));
-                break;
-            case 'undefined':
-                res.setHeader('Content-Length', 0);
-                break;
-            default:
-                res.setHeader('Content-Length', buffer.length);
+        if(buffer){
+            switch(typeof buffer){
+                case 'string':
+                    res.setHeader('Content-Length', Buffer.byteLength(buffer, 'utf-8'));
+                    break;
+                case 'undefined':
+                    res.setHeader('Content-Length', 0);
+                    break;
+                default:
+                    res.setHeader('Content-Length', buffer.length);
+            }
         }
     },
 
